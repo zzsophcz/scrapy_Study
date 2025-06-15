@@ -1,5 +1,6 @@
 import scrapy
 import pickle
+from pixiv_pic.items import PixivPicItem
 
 class PixivPicSpiderSpider(scrapy.Spider):
     name = "pixiv_pic_spider"
@@ -42,13 +43,17 @@ class PixivPicSpiderSpider(scrapy.Spider):
         pic_url=response.xpath('//div[@role="presentation"]//a/@href').extract_first()#找不到，依旧是动态渲染
         if pic_url!=None:
             print("图片地址"+pic_url)
-            yield scrapy.Request(
-                url=pic_url,
-                headers={
-                    'Referer': 'https://www.pixiv.net/',  # 必须加 Referer
-                },
-                callback=self.save_image
-            )
+            item = PixivPicItem()
+            item['image_urls'] = [pic_url]
+            yield item
+
+            # yield scrapy.Request(
+            #     url=pic_url,
+            #     headers={
+            #         'Referer': 'https://www.pixiv.net/',  # 必须加 Referer
+            #     },
+            #     callback=self.save_image
+            # )
 
     def save_image(self, response):
         image_name = response.url.split('/')[-1]

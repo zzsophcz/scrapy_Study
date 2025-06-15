@@ -66,9 +66,13 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    "pixiv_pic.pipelines.PixivPicPipeline": 300,
-#}
+ITEM_PIPELINES = {
+   # "pixiv_pic.pipelines.PixivPicPipeline": 300,
+   #  "scrapy.pipelines.images.ImagesPipeline": 1,
+    'pixiv_pic.pipelines.PixivImagesPipeline': 1,
+}
+# 图片下载保存路径（绝对路径或相对路径）
+IMAGES_STORE = 'images'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
