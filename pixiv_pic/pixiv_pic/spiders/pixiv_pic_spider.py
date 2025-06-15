@@ -40,12 +40,12 @@ class PixivPicSpiderSpider(scrapy.Spider):
     def parse_detail(self, response):
         # pass
         print("作品详情页面"+response.url)
-        pic_url=response.xpath('//div[@role="presentation"]//a/@href').extract_first()#找不到，依旧是动态渲染
+        pic_url=response.xpath('//div[@role="presentation"]//a/@href').extract()#找不到，依旧是动态渲染
         author = response.xpath('//div[@class="sc-d91e2d15-1 iiAAJk"]/a/div[1]/text()').extract_first()
         if pic_url!=None:
-            print("图片地址"+pic_url)
+            print("图片地址",pic_url)
             item = PixivPicItem()
-            item['image_urls'] = [pic_url]
+            item['image_urls'] = pic_url
             item['author'] = author
             yield item
 
