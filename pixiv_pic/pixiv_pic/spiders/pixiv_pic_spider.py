@@ -22,7 +22,7 @@ class PixivPicSpiderSpider(scrapy.Spider):
             print("Cookies loaded:", cookies_list)
         cookies_dict = {cookie['name']: cookie['value'] for cookie in cookies_list}
 
-        yield scrapy.Request(url=url, callback=self.parse, meta={"selenium": True},cookies=cookies_dict)
+        yield scrapy.Request(url=url, callback=self.parse, meta={"selenium": 'shouCang'},cookies=cookies_dict)
 
     ##这个函数是翻页防止死循环的处理
     def __init__(self, *args, **kwargs):
@@ -43,13 +43,14 @@ class PixivPicSpiderSpider(scrapy.Spider):
         # works=response.xpath('//ul[contains(@class,"sc-bf8cea3f-1")]/li[1]/div/div[2]/a/@href').extract_first()
         work = response.xpath('//ul[contains(@class,"sc-bf8cea3f-1")]/li[2]/div/div[2]/a/@href').extract_first()
         work=response.urljoin(work)
-        yield scrapy.Request(url=work, callback=self.parse_detail, meta={"selenium": False},cookies=response.request.cookies)
+        yield scrapy.Request(url=work, callback=self.parse_detail, meta={"selenium": 'pic'},cookies=response.request.cookies)
 
     def parse_detail(self, response):
         print("作品详情页面"+response.url)
-        pic_url=response.xpath('//img[contains(@src,"img-original")]/@src').extract_first()#找不到，依旧是动态渲染
+        pic_url=response.xpath('//div[@role="presentation"]//a/@href').extract_first()#找不到，依旧是动态渲染
         print(pic_url)
-
+        # with open("图片详情页面.html", "w", encoding="utf-8") as f:
+        #     f.write(response.text)
 
         ##这段是验证动态渲染被成功爬下来的处理
         # #保存网页源代码
