@@ -3,7 +3,7 @@ import pickle
 
 class PixivPicSpiderSpider(scrapy.Spider):
     name = "pixiv_pic_spider"
-    allowed_domains = ["pixiv.net"]
+    allowed_domains = ["pixiv.net","i.pximg.net"]#添加新域名以便访问图片
     start_urls = ["https://www.pixiv.net/users/49460730"]
 
     def start_requests(self):
@@ -43,9 +43,13 @@ class PixivPicSpiderSpider(scrapy.Spider):
         # works=response.xpath('//ul[contains(@class,"sc-bf8cea3f-1")]/li[1]/div/div[2]/a/@href').extract_first()
         work = response.xpath('//ul[contains(@class,"sc-bf8cea3f-1")]/li[2]/div/div[2]/a/@href').extract_first()
         work=response.urljoin(work)
-        yield scrapy.Request(url=work, callback=self.parse_detail, meta={"selenium": 'pic'},cookies=response.request.cookies)
+        print(work)
+        yield scrapy.Request(url=work, callback=self.parse_detail, meta={"selenium": 'pic'},cookies=response.request.cookies,headers={
+        'Referer': 'https://www.pixiv.net/'  # 👈 这里自定义 Referer
+    })
 
     def parse_detail(self, response):
+        # pass
         print("作品详情页面"+response.url)
         pic_url=response.xpath('//div[@role="presentation"]//a/@href').extract_first()#找不到，依旧是动态渲染
         print(pic_url)
