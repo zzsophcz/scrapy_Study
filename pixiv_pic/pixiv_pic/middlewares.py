@@ -19,6 +19,10 @@ from scrapy.http import HtmlResponse
 
 class SeleniumSpiderMiddleware(object):
     def process_request(self, request, spider):
+        sel_flag = request.meta.get("selenium")  # 标记处理方式
+        if not sel_flag:
+            return None  # 普通请求，不处理
+
         url = request.url
         cookies_dict = request.cookies
         driver = webdriver.Chrome()
@@ -41,8 +45,15 @@ class SeleniumSpiderMiddleware(object):
             driver.get(url)
             time.sleep(2)  # 适当等待页面加载
 
+            #在这里添加进入个人收藏页面的selenium处理
+            button=driver.find_element(By.XPATH,'//nav/a[contains(@href,"bookmarks")]')
+            driver.execute_script("arguments[0].click();", button)
+            time.sleep(3)
+
             # 第四步：获取页面源代码
             html = driver.page_source
+
+            input("暂停查看网页源代码")
 
             # 第五步：构造 HtmlResponse 对象返回
             return HtmlResponse(
@@ -54,3 +65,6 @@ class SeleniumSpiderMiddleware(object):
 
         finally:
             driver.quit()
+
+    def enter_shouCang(self,driver,request):
+
