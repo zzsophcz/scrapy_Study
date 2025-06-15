@@ -41,18 +41,37 @@ class PixivPicSpiderSpider(scrapy.Spider):
 
         print(response.url)
         # works=response.xpath('//ul[contains(@class,"sc-bf8cea3f-1")]/li[1]/div/div[2]/a/@href').extract_first()
-        work = response.xpath('//ul[contains(@class,"sc-bf8cea3f-1")]/li[2]/div/div[2]/a/@href').extract_first()
-        work=response.urljoin(work)
-        print(work)
-        yield scrapy.Request(url=work, callback=self.parse_detail, meta={"selenium": 'pic'},cookies=response.request.cookies,headers={
-        'Referer': 'https://www.pixiv.net/'  # 👈 这里自定义 Referer
-    })
+        works = response.xpath('//ul[contains(@class,"sc-bf8cea3f-1")]/li')
+        print(len(works))
+        for work in works:
+            item={}
+            item["link"]=response.urljoin(work.xpath('./div/div[2]/a/@href').extract_first())
+            # print(item["link"])
+            #获取图片url字典
+            yield scrapy.Request(url=item["link"], callback=self.parse_detail, meta={"selenium": 'pic'},
+                                 cookies=response.request.cookies)
+        # yield scrapy.Request(url=work, callback=self.parse_detail, meta={"selenium": 'pic'},cookies=response.request.cookies)
 
     def parse_detail(self, response):
         # pass
         print("作品详情页面"+response.url)
         pic_url=response.xpath('//div[@role="presentation"]//a/@href').extract_first()#找不到，依旧是动态渲染
-        print(pic_url)
+        if pic_url!=None:
+            print("图片地址"+pic_url)
+            yield scrapy.Request(
+                url=pic_url,
+                headers={
+                    'Referer': 'https://www.pixiv.net/',  # 必须加 Referer
+                },
+                callback=self.save_image
+            )
+
+    def save_image(self, response):
+        image_name = response.url.split('/')[-1]
+        with open(f'pixiv_images/{image_name}', 'wb') as f:
+            f.write(response.body)
+            print(f"[+] 图片已保存为 {image_name}")
+
         # with open("图片详情页面.html", "w", encoding="utf-8") as f:
         #     f.write(response.text)
 

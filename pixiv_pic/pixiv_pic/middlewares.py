@@ -99,7 +99,7 @@ class SeleniumSpiderMiddleware(object):
         # 第四步：获取页面源代码
         html = driver.page_source
 
-        input("暂停查看网页源代码2")
+        # input("暂停查看网页源代码2")
 
         # 第五步：构造 HtmlResponse 对象返回
         return HtmlResponse(
