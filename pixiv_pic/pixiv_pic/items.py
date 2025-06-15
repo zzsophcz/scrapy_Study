@@ -11,4 +11,4 @@ class PixivPicItem(scrapy.Item):
     # name = scrapy.Field()
     image_urls = scrapy.Field()  # 必须字段，图片的 URL 列表
     images = scrapy.Field()  # 自动填充字段，图片处理后的信息
-
+    author = scrapy.Field()

@@ -9,7 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 import pickle
-
+#
 # driver = webdriver.Chrome()
 # driver.get("https://www.pixiv.net")
 #
@@ -18,7 +18,7 @@ import pickle
 #
 # # 保存登录后的 cookie 到文件
 # cookies = driver.get_cookies()
-# with open("pixiv_pic/pixiv_cookies.pkl", "wb") as f:
+# with open("pixiv_cookies.pkl", "wb") as f:
 #     pickle.dump(cookies, f)
 #
 # driver.quit()
