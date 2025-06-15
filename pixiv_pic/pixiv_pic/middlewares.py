@@ -77,14 +77,9 @@ class SeleniumSpiderMiddleware(object):
         time.sleep(2)  # 适当等待页面加载
 
         # 在这里添加进入个人收藏页面的selenium处理
-        try:
-            button = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, '//nav/a[contains(@href,"bookmarks")]'))
-            )
-            driver.execute_script("arguments[0].click();", button)
-            time.sleep(3)
-        except Exception as e:
-            print(f"[!] 点击收藏按钮失败: {e}")
+        button = driver.find_element(By.XPATH, '//nav/a[contains(@href,"bookmarks")]')
+        driver.execute_script("arguments[0].click();", button)
+        time.sleep(3)
 
         # 第四步：获取页面源代码
         html = driver.page_source
