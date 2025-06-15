@@ -17,26 +17,45 @@ from scrapy.http import HtmlResponse
 
 
 class SeleniumSpiderMiddleware(object):
+    def __init__(self):
+        print("[*] 初始化共享 Selenium 浏览器...")
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")  # 可选：无头模式
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        self.driver = webdriver.Chrome(options=options)
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        middleware = cls()
+        crawler.signals.connect(middleware.spider_closed, signal=signals.spider_closed)
+        return middleware
+
+    def spider_closed(self, spider):
+        print("[*] 关闭 Selenium 浏览器...")
+        self.driver.quit()
+
     def process_request(self, request, spider):
         sel_flag = request.meta.get("selenium")  # 标记处理方式
         if not sel_flag:
             return None  # 普通请求，不处理
 
-        driver = webdriver.Chrome()
+        # driver = webdriver.Chrome()
 
         try:
             if sel_flag == "shouCang":
-                return self.enter_shouCang(driver, request)
+                return self.enter_shouCang(request)
             elif sel_flag == "pic":
-                return self.handle_pic(driver, request)
+                return self.handle_pic(request)
             else:
                 print("未知 selenium 模式")
                 return None
-        finally:
-            driver.quit()
+        except Exception as e:
+            print(f"[!] Selenium 处理请求出错: {e}")
+            return None
 
-    def enter_shouCang(self, driver, request):
-
+    def enter_shouCang(self, request):
+        driver = self.driver
         url = request.url
         cookies_dict = request.cookies
 
@@ -75,7 +94,8 @@ class SeleniumSpiderMiddleware(object):
             request=request
         )
 
-    def handle_pic(self, driver, request):
+    def handle_pic(self, request):
+        driver = self.driver
         url = request.url
         cookies_dict = request.cookies
 
