@@ -20,9 +20,9 @@ class SeleniumSpiderMiddleware(object):
     def __init__(self):
         print("[*] 初始化共享 Selenium 浏览器...")
         options = webdriver.ChromeOptions()
-        # options.add_argument("--headless")  # 可选：无头模式
-        # options.add_argument("--disable-gpu")
-        # options.add_argument("--no-sandbox")
+        options.add_argument("--headless")  # 可选：无头模式
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
         self.driver = webdriver.Chrome(options=options)
 
     @classmethod
@@ -78,7 +78,7 @@ class SeleniumSpiderMiddleware(object):
 
         # 在这里添加进入个人收藏页面的selenium处理
         try:
-            button = WebDriverWait(driver, 10).until(
+            button = WebDriverWait(driver, 4).until(
                 EC.element_to_be_clickable((By.XPATH, '//nav/a[contains(@href,"bookmarks")]'))
             )
             driver.execute_script("arguments[0].click();", button)
@@ -122,13 +122,13 @@ class SeleniumSpiderMiddleware(object):
         time.sleep(2)  # 适当等待页面加载
         #处理一个页面由多个图片的情况
         try:
-            button = WebDriverWait(driver, 10).until(
+            button = WebDriverWait(driver, 4).until(
                 EC.element_to_be_clickable((By.XPATH, '//div[@class="sc-9222a8f6-2 kufPoS"]'))
             )
             driver.execute_script("arguments[0].click();", button)
             time.sleep(3)
         except Exception as e:
-            print(f"[!] 点击收藏按钮失败: {e}")
+            print(f"[!] 没有多个图片！: {e}")
 
         # 第四步：获取页面源代码
         html = driver.page_source

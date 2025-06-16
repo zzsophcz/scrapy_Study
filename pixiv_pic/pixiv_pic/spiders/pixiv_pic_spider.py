@@ -1,5 +1,6 @@
 import scrapy
 import pickle
+import re
 from pixiv_pic.items import PixivPicItem
 
 #不好定义在类内，因为类内参数第一个是self，在类内会导致参数传递出问题
@@ -17,7 +18,7 @@ def load_processed_links(file_path='processed_links.txt'):
 class PixivPicSpiderSpider(scrapy.Spider):
     name = "pixiv_pic_spider"
     allowed_domains = ["pixiv.net","i.pximg.net"]#添加新域名以便访问图片
-    start_urls = ["https://www.pixiv.net/users/49460730"]
+    start_urls = ["https://www.pixiv.net/users/98873340"]
 
     def start_requests(self):
         url=self.start_urls[0]
@@ -40,9 +41,12 @@ class PixivPicSpiderSpider(scrapy.Spider):
         print(response.url)
         # works=response.xpath('//ul[contains(@class,"sc-bf8cea3f-1")]/li[1]/div/div[2]/a/@href').extract_first()
         works = response.xpath('//ul[contains(@class,"sc-bf8cea3f-1")]/li')
-        print(len(works))
+        next_url=response.urljoin(response.xpath('//nav[@class="sc-27a0ff07-0 bbkQMy"]/a[last()]/@href').extract_first())
+        print("Next url:", next_url)
+        print("作品数量：",len(works))
         for work in works:
             relative_url=response.urljoin(work.xpath('./div/div[2]/a/@href').extract_first())
+            print("Work url:", relative_url)
             # 如果链接已处理，跳过
             if relative_url in self.processed_links:
                 print("已经处理过该链接，跳过节省时间")
@@ -55,7 +59,10 @@ class PixivPicSpiderSpider(scrapy.Spider):
             # print(item["link"])
             yield scrapy.Request(url=relative_url, callback=self.parse_detail, meta={"selenium": 'pic'},
                                  cookies=response.request.cookies)
-        print("如果这段消息出现在最后，说明链接都已经是处理过的了")
+        # print("如果这段消息出现在最后，说明链接都已经是处理过的了")
+        if next_url!=response.url and not re.search(r"[?&]p=1(?:$|&)", next_url):
+            print("有新的一页，继续爬取作品url")
+            yield scrapy.Request(url=next_url, callback=self.parse, meta={"selenium": 'shouCang'},cookies=response.request.cookies)
 
     def parse_detail(self, response):
         # pass
