@@ -1,0 +1,2 @@
+1.在pixiv_pic/spiders/pixiv_pic_spider.py文件中修改start_urls = ["https://www.pixiv.net/users/98873340"]
+2.使用框架命令开启爬虫即可，注意有一个process_links.txt，这里记录了上次爬虫程序爬取的作品名，可以避免重复爬取
