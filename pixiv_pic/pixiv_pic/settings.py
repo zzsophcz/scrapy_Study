@@ -70,7 +70,14 @@ ITEM_PIPELINES = {
    # "pixiv_pic.pipelines.PixivPicPipeline": 300,
    #  "scrapy.pipelines.images.ImagesPipeline": 1,
     'pixiv_pic.pipelines.PixivImagesPipeline': 1,
+    #开启此管道会将数据存入Redis数据库中
+    'scrapy_redis.pipelines.RedisPipeline' : 400
 }
+#设置redis数据库
+REDIS_URL="redis://127.0.0.1:6379"
+#设置下载延迟
+DOWNLOAD_DELAY=1
+
 # 图片下载保存路径（绝对路径或相对路径）
 IMAGES_STORE = 'images'
 
@@ -106,5 +113,16 @@ IMAGES_STORE = 'images'
 # # 指定使用哪个浏览器（chromium、firefox 或 webkit，默认推荐 chromium）
 # PLAYWRIGHT_BROWSER_TYPE = "chromium"
 
+#分布式爬虫配置文件固定参数
+#设置重复过滤器的模块，（使用scrapy-redis提供的去重类）
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+# 使用scrapy-redis提供的调度器，这个调度器具备和数据库交互的功能
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+#设置当爬虫结束的时候是否保持redis数据库中的去重集合与任务队列(不清空redis数据库)
+SCHEDULER_PERSIST=True
+# 使用scrapy-redis的队列类（可选：队列或栈或优先队列）
+#SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.FifoQueue" #默认队列（FIFO
+# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.LifoQueue"  # 栈
+# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.PriorityQueue"  # 优先级队列
 
 FEED_EXPORT_ENCODING = "utf-8"
