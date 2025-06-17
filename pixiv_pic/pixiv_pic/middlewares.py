@@ -47,8 +47,45 @@ class SeleniumSpiderMiddleware(object):
                 return self.enter_shouCang(request)
             elif sel_flag == "pic":
                 return self.handle_pic(request)
+            elif sel_flag == "True":
+                print("常规 selenium 模式，即获取网页源代码，不做任何selenium处理")
+                driver = self.driver
+                url = request.url
+                print("中间件进入常规页面处理，此时的url是：", url)
+                cookies_dict = request.cookies
+
+                # 第一步：先访问主域名页面（用于设置 cookie）
+                base_url = "https://www.pixiv.net/"
+                driver.get(base_url)
+                time.sleep(1)
+
+                # 第二步：注入 cookies
+                for name, value in cookies_dict.items():
+                    cookie = {'name': name, 'value': value, 'domain': '.pixiv.net'}
+                    try:
+                        driver.add_cookie(cookie)
+                    except Exception as e:
+                        print(f"[!] 添加 cookie 失败: {cookie} | 原因: {e}")
+
+                # 第三步：访问目标页面
+                driver.get(url)
+                time.sleep(5)  # 适当等待页面加载
+
+                # 第四步：获取页面源代码
+                print("最后返回的页面源代码的url:", driver.current_url)
+                html = driver.page_source
+
+                # input("暂停查看网页源代码")
+
+                # 第五步：构造 HtmlResponse 对象返回
+                return HtmlResponse(
+                    url=driver.current_url,
+                    body=html,
+                    encoding='utf-8',
+                    request=request
+                )
             else:
-                print("未知 selenium 模式")
+                print("未启用")
                 return None
         except Exception as e:
             print(f"[!] Selenium 处理请求出错: {e}")
@@ -57,12 +94,13 @@ class SeleniumSpiderMiddleware(object):
     def enter_shouCang(self, request):
         driver = self.driver
         url = request.url
+        print("中间件进入收藏页面处理，此时的url是：",url)
         cookies_dict = request.cookies
 
         # 第一步：先访问主域名页面（用于设置 cookie）
         base_url = "https://www.pixiv.net/"
         driver.get(base_url)
-        time.sleep(1)
+        time.sleep(2)
 
         # 第二步：注入 cookies
         for name, value in cookies_dict.items():
@@ -74,7 +112,7 @@ class SeleniumSpiderMiddleware(object):
 
         # 第三步：访问目标页面
         driver.get(url)
-        time.sleep(2)  # 适当等待页面加载
+        time.sleep(5)  # 适当等待页面加载
 
         # 在这里添加进入个人收藏页面的selenium处理
         try:
@@ -87,6 +125,7 @@ class SeleniumSpiderMiddleware(object):
             print(f"[!] 点击收藏按钮失败: {e}")
 
         # 第四步：获取页面源代码
+        print("最后返回的页面源代码的url:",driver.current_url)
         html = driver.page_source
 
         # input("暂停查看网页源代码")
@@ -107,7 +146,7 @@ class SeleniumSpiderMiddleware(object):
         # 第一步：先访问主域名页面（用于设置 cookie）
         base_url = "https://www.pixiv.net/"
         driver.get(base_url)
-        time.sleep(1)
+        time.sleep(2)
 
         # 第二步：注入 cookies
         for name, value in cookies_dict.items():
@@ -128,7 +167,8 @@ class SeleniumSpiderMiddleware(object):
             driver.execute_script("arguments[0].click();", button)
             time.sleep(3)
         except Exception as e:
-            print(f"[!] 没有多个图片！: {e}")
+            # print(f"[!] 没有多个图片！: {e}")
+            print("此作品没有多个图片！")
 
         # 第四步：获取页面源代码
         html = driver.page_source

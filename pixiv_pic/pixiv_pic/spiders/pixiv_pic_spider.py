@@ -18,7 +18,9 @@ def load_processed_links(file_path='processed_links.txt'):
 class PixivPicSpiderSpider(scrapy.Spider):
     name = "pixiv_pic_spider"
     allowed_domains = ["pixiv.net","i.pximg.net"]#添加新域名以便访问图片
-    start_urls = ["https://www.pixiv.net/users/98873340"]
+    start_urls = ["https://www.pixiv.net/users/49460730"]
+    #https://www.pixiv.net/users/49460730 ssy
+    #https://www.pixiv.net/users/59028877 lyx
 
     def start_requests(self):
         url=self.start_urls[0]
@@ -62,7 +64,7 @@ class PixivPicSpiderSpider(scrapy.Spider):
         # print("如果这段消息出现在最后，说明链接都已经是处理过的了")
         if next_url!=response.url and not re.search(r"[?&]p=1(?:$|&)", next_url):
             print("有新的一页，继续爬取作品url")
-            yield scrapy.Request(url=next_url, callback=self.parse, meta={"selenium": 'shouCang'},cookies=response.request.cookies)
+            yield scrapy.Request(url=next_url, callback=self.parse, meta={"selenium": 'True'},cookies=response.request.cookies)
 
     def parse_detail(self, response):
         # pass

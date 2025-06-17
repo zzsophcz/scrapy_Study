@@ -38,6 +38,12 @@ class PixivImagesPipeline(ImagesPipeline):
         image_url = request.url
         filename = os.path.basename(urlparse(image_url).path)
 
+        # 设置绝对路径的基础目录（你可以根据需要修改这里）
+        base_dir = 'F:/pixiv_images'  # 改成你自己的绝对路径
+
+        # 拼接最终绝对路径：/home/yourusername/pixiv_images/画师名/文件名
+        return os.path.join(base_dir, author, filename)
+
         # 最终路径：画师名/文件名，例如：かまんべーる/123263099_p0.png
-        return f'{author}/{filename}'
+        # return f'{author}/{filename}'
 
